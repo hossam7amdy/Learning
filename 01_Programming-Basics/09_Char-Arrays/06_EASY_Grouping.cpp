@@ -14,7 +14,7 @@ int main(){
     string str;
     cin >> str;
 
-    //Dr's did it in a very easy way think and stop brute-forcing.
+    //Dr's did it in a very easy way think deeper and stop brute-forcing.
 
     string grouped = "";
     grouped += str[0];

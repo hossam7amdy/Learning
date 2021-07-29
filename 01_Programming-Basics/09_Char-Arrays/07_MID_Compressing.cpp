@@ -13,19 +13,20 @@ using namespace std;
 int main(){
     string str;
     cin >> str;
+    //He uses => str += "$"
 
-    //There is a bug. I think there is a better solution.
+    bool st_group = true;
+    int cnt = 1, sz = (int)str.size();
+    for(int i=0; i<sz; i++){
+        if(str[i]!=str[i+1]){
+            if(!st_group)
+                cout << '_';
 
-    int cnt = 1;
-    for(int i=0; i<(int)str.size(); i++){
-        if(str[i]==str[i+1])
-            cnt++;
-        else{
-            cout << str[i] << cnt;
-            cnt = 1;
-            if(i<(int)str.size())
-                cout << '-';
+        cout << str[i] << cnt;
+        cnt = 0; //reset the counter
+        st_group = false; // not first anymore
         }
+        cnt++;
     }
 
 

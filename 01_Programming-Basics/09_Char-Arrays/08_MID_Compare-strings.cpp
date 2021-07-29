@@ -15,12 +15,27 @@ Otherwise, output NO
 */
 
 int main(){
-    string str;
-    cin >> str;
+    string str1, str2;
+    cin >> str1 >> str2;
 
+    int sz1 = (int)str1.size();
+    int sz2 = (int)str2.size();
 
+    for(int i=0; i<sz1 && i<sz2; i++){
+        if(str1[i]<str2[i]){
+            cout << "Yes";
+            return 0;
+        }
+        else if(str1[i]>str2[i]){
+            cout << "No";
+            return 0;
+        }
+    }
 
-
+    if(sz1<sz2)
+        cout << "Yes";
+    else
+        cout << "No";
 
     return 0;
 }
