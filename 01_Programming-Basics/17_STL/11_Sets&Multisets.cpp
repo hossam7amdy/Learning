@@ -43,7 +43,10 @@ void print(auto &s){
 
 int main(){
     set<string> st; // ordered & unique
-    st.insert("hossam"), st.insert("hossam"), st.insert("ahmed"), st.insert("emad");
+    st.insert("hossam"), st.insert("ahmed"), st.insert("emad");
+    auto [done] = st.insert("ahmed");
+    if(!done)
+        cout << "exist\n";
     if(st.count("hossam"))
         cout << "Yes\n";
     auto it = st.begin();

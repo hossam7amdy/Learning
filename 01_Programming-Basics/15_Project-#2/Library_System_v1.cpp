@@ -386,6 +386,7 @@ struct library_system{
 
 
 int main(){
+    //freopen("\\test_sample.txt", "rt", stdin);
     library_system Library = library_system();
     Library.run();
 
