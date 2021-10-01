@@ -7,7 +7,7 @@
 #include<algorithm>
 using namespace std;
 
-//Trial to rewrite the hole project after I reviewed it.
+/// Let's Rewrite from scratch ///
 
 const string USERS_FILE = "users.txt";
 const string QUESTIONS_FILE = "questions.txt";
@@ -64,9 +64,11 @@ int Choice(int low, int high) {
     int choose;
     cout << "Enter number between [" << low << " - " << high << "] : ";
     cin >> choose;
-    if (low <= choose && choose <= high)
+    if (low <= choose && choose <= high && !cin.fail())
         return choose;
     cout << "\nInvalid choice. Try again!\n\n";
+    cin.clear();
+    cin.ignore(264, '\n');
     return Choice(low, high);
 }
 
@@ -212,9 +214,9 @@ struct UsersManager {
         for (auto& line : Lines) {
             if (line.empty())
                 continue;
-            current_user = User(line);
-            users[current_user.name] = current_user;
-            user_id = max(user_id, current_user.user_id);
+            User tempUser(line);
+            users[tempUser.name] = tempUser;
+            user_id = max(user_id, tempUser.user_id);
         }
         return;
     }
@@ -411,8 +413,9 @@ struct QuesionsManager {
             cout << "Warning: Already answered. Answer will be updated.\n";
 
         cout << "Enter answer text: ";
+        cin.ignore();
         getline(cin, questions[q_id].answer);
-        getline(cin, questions[q_id].answer);
+        //getline(cin, questions[q_id].answer);
         return;
     }
 
@@ -495,8 +498,9 @@ struct QuesionsManager {
         question.from_user = user.user_id;
 
         cout << "Enter question text: ";
+        cin.ignore(264,'\n');
         getline(cin, question.question);
-        getline(cin, question.question);
+        //getline(cin, question.question);
 
         question.question_id = ++question_id;
         questions[question.question_id] = question;
@@ -542,7 +546,7 @@ struct AskMeSystem {
         users_manager.LoadDatabase();
         questions_manager.LoadDatabase();
 
-        if (fill_users_questions)
+        if(fill_users_questions)
             questions_manager.FillUsersQuestions(users_manager.current_user);
     }
 
@@ -562,8 +566,8 @@ struct AskMeSystem {
         menu.push_back("Logout");
 
         while (true) {
-            int choice = Menu(menu);
             LoadSystemData(true);
+            int choice = Menu(menu);
 
             if (choice == 1)
                 questions_manager.PrintQuestionsToMe(users_manager.current_user);
