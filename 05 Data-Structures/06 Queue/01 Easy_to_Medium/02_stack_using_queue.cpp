@@ -1,5 +1,9 @@
 #include<iostream>
 #include<assert.h>
+
+#include<stack>
+#include<queue>
+
 using namespace std;
 
 typedef int type;
@@ -108,9 +112,41 @@ public:
     }
 };
 
+/// Using STL
+class myStack{
+private:
+    queue<int> q;
+
+    void addFront(const int &value){
+        int sz { q.size() };
+        q.push(value);
+
+        while(sz--){
+            q.push(q.front());
+            q.pop();
+        }
+    }
+
+public:
+    void push(const int &value){ // O(n)
+        addFront(value);
+    }
+    void pop(){ // O(1)
+        assert(!q.empty());
+        q.pop();
+    }
+    int top() { // O(1)
+        assert(!q.empty());
+        return q.front();
+    }
+    bool isEmpty() const { // O(1)
+        return q.empty();
+    }
+};
+
 int main(){
 
-	Stack stk(3);
+	myStack stk;
 	stk.push(10);
 	stk.push(20);
 	stk.push(30);

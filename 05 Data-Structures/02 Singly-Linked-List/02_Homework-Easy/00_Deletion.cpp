@@ -5,22 +5,22 @@
 #include <sstream>
 using namespace std;
 
-struct Node {
-	int data { };
-	Node* next { };
-	Node(int data) : data(data) {}
-	~Node() {
-		cout << "Destroy value: " << data <<" at address "<< this<< "\n";
-	}
-};
-
 class LinkedList {
 private:
+    struct Node {
+        int data { };
+        Node* next { };
+        Node(int data) : data(data) {}
+        ~Node() {
+            cout << "Destroy value: " << data <<" at address "<< this<< "\n";
+        }
+    };
+
 	Node *head { };
 	Node *tail { };
 	int length = 0;	// let's maintain how many nodes
 
-    void delete_node(Node* node) {
+    void deleteNode(Node* node) { // O(1)
 		--length;
 		debug_remove_node(node);
 		delete node;
@@ -110,12 +110,13 @@ public:
 	LinkedList(const LinkedList&) = delete;
 	LinkedList &operator=(const LinkedList &another) = delete;
 
-    void print() {
+    void print() { // O(n)
 		for (Node* cur = head; cur; cur = cur->next)
 			cout << cur->data << " ";
 		cout << "\n";
 	}
-	void add_node(int value) {
+
+	void addEnd(const int &value) { // O(1)
 	    Node* item = new Node(value);
 	    if(!head)
             head = tail = item;
@@ -127,7 +128,8 @@ public:
 
 		debug_add_node(item);
 	}
-    Node* get_nth(int n){
+
+    Node* getNth(int n){ // O(n)
         n--; // Zero-Based
         if(0>n || n>length)
             return nullptr;
@@ -137,19 +139,12 @@ public:
             res = res->next;
         return res;
     }
-    int Search(int value){
-        int idx = 0;
-        for(Node* curr = head; curr; curr = curr->next, idx++)
-            if(curr->data == value)
-                return idx;
 
-        return -1;
-    }
-	void delete_front(){
+	void deleteFront(){ // O(1)
 	    if(head){
             Node* curr = head;
             head = head->next;
-            delete_node(curr);
+            deleteNode(curr);
 	    }
 
         if(!head)
@@ -157,63 +152,46 @@ public:
 
         debug_verify_data_integrity();
 	}
-	void delete_end(){
-	    if(length==1){
-            delete_front();
+	void deleteEnd(){ // O(1)
+	    if(length <= 1){
+            deleteFront();
             return;
 	    }
 
-	    Node* previous = get_nth(length-1);
+	    Node* previous = getNth(length - 1);
 
-	    delete_node(tail);
+	    deleteNode(tail);
 	    tail = previous;
 	    tail->next = nullptr;
 
 	    debug_verify_data_integrity();
 	}
-	void delete_nth(int idx){
-	    if(1>idx || idx>length)
-            cout << "Invalid Node\n";
 
-	    else if(idx==1)
-            delete_front();
+	~LinkedList(){ // O(n)
+        while(head){
+            Node* temp = head;
+            head = head->next;
 
-	    else{
-	    Node* previous = get_nth(idx-1);
-	    Node* target = previous->next;
-
-	    previous->next = target->next;
-
-	    if(target==tail)
-            tail = previous;
-
-        delete_node(target);
-	    }
-
-	    debug_verify_data_integrity();
-	}
-	void delete_node_with_value(int value){
-	    int idx = Search(value);
-	    if(idx == -1)
-            cout << "There is no such value\n";
-        else
-            delete_nth(idx+1);
-
-        debug_verify_data_integrity();
+            delete temp;
+        }
 	}
 };
 
 int main(){
     LinkedList List;
-    List.add_node(10);
-    List.add_node(20);
-    List.add_node(30);
+    List.addEnd(10);
+    List.addEnd(20);
+    List.addEnd(30);
     List.print();
 
 
-    List.delete_node_with_value(30);
-    List.delete_node_with_value(10);
-    List.delete_node_with_value(20);
+    List.deleteFront();
+    List.deleteEnd();
+    List.deleteEnd();
+
+    // nothing to delete
+    List.deleteFront();
+    List.deleteEnd();
 
     List.print();
 

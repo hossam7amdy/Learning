@@ -1,5 +1,6 @@
 #include<iostream>
 #include<assert.h>
+#include<stack>
 using namespace std;
 
 template<class type>
@@ -66,17 +67,45 @@ public:
     }
 };
 
+void insertButtom(stack<int> &st, const int &data){ // O(n) time && space
+    if(st.empty())
+        st.push(data);
+    else{
+        int cur = st.top();
+        st.pop();
+
+        insertButtom(st, data);
+
+        // backtracking
+        st.push(cur);
+    }
+}
+
+void reverseStack(stack<int> &st){ // O(n) time && space
+    if(st.empty())
+        return;
+
+    int cur{ st.top() };
+    st.pop();
+
+    reverseStack(st);
+
+    insertButtom(st, cur);
+}
 
 int main(){
-    Stack<int> st(10);
+    stack<int> st;
     st.push(1);
     st.push(2);
     st.push(3);
     st.push(4);
-    st.Display();
 
-    st.Reverse();
-    st.Display();
+    reverseStack(st);
+
+    while(!st.empty()){
+        cout << st.top() << " ";
+        st.pop();
+    }
 
 
     return 0;

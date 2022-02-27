@@ -91,7 +91,7 @@ string infixToPostfix_v2(string infix){
     Stack operators;
 
     infix += '-'; // what ever lowest priority: force stack got empty
-    operators.push('#'); // remove isEmpty() condition
+    operators.push('#'); // removes isEmpty() condition
 
     for(int i=0; i<(int)infix.size(); i++){
         char ch = infix[i];
@@ -111,7 +111,7 @@ int main(){
 
     cout << infixToPostfix("1+3*5-8/2") << "\n";
 
-    cout << infixToPostfix_v2("2+3*4-5*6+7") << "\n";
+    cout << infixToPostfix_v2("2+3-2") << "\n";
 
     //cout << infixToPostfix("2+(3*(4-5*2)*(9/3+6))") << "\n";
 
