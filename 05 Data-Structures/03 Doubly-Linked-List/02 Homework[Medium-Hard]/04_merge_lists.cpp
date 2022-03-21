@@ -1,51 +1,31 @@
 #include <iostream>
-#include <cassert>
-#include <climits>
-
-#include <vector>		// for debug
-#include <algorithm>
-#include <sstream>
 using namespace std;
-
-struct Node{
-    int data{ };
-    Node* next{ };
-    Node* prev{ };
-
-    Node(int data): data(data){ }
-    ~Node(){
-        cout << "Destroy value: " << data << " at address " << this << "\n";
-    }
-};
-
-bool sort_data(const Node* n1, const Node* n2){
-    return n1->data < n2->data;
-}
 
 class LinkedList{
 private:
+    struct Node{
+        int data{ };
+        Node* next{ };
+        Node* prev{ };
+
+        Node(int data): data(data){ }
+        ~Node(){
+            //cout << "Destroy value: " << data << " at address " << this << "\n";
+        }
+    };
+
     Node* head{ };
     Node* tail{ };
     int length{ };
 
-    // for debugging
-    vector<Node*> debug_data;
-
-    void debug_add_node(Node* node){
-        debug_data.push_back(node);
-    }
-    void debug_remove_node(Node* node){
-        auto it = find(debug_data.begin(), debug_data.end(), node);
-
-        if(it!=debug_data.end())
-            debug_data.erase(it);
-        else
-            cout << "Node does not exist\n";
+    void link(Node* first, Node* second){
+        if(first)
+            first->next = second;
+        if(second)
+            second->prev = first;
     }
 public:
     LinkedList() { }
-    LinkedList(const LinkedList&) = delete;
-    void operator=(const LinkedList&) = delete;
     ~LinkedList(){
         while(head){
             Node* cur = head;
@@ -55,128 +35,8 @@ public:
         head = tail = nullptr;
     }
 
-    ////////////////////// Debugging Utilities /////////////////////
-    string debug_to_string(){
-        if(!length)
-            return "";
-
-        ostringstream oss;
-        for(Node* cur=head; cur; cur=cur->next){
-            oss << cur->data;
-
-            if(cur->next)
-                oss << " ";
-        }
-        return oss.str();
-    }
-
-    void debug_print_node(Node* node){
-        if(node==nullptr){
-            cout << "nullptr\n";
-            return;
-        }
-
-        if(node->prev==nullptr)
-            cout << "X\t";
-        else
-            cout << node->prev->data << "\t";
-
-        cout << "<= [" << node->data << "] =>\t";
-
-        if(node->next==nullptr)
-            cout << "X\t";
-        else
-            cout << node->next->data << "\t";
-
-        if(node==head)
-            cout << "head\n";
-        else if(node==tail)
-            cout << "tail\n";
-        else
-            cout << "\n";
-    }
-    void debug_print_List(){
-        for(const auto item : debug_data)
-            debug_print_node(item);
-        cout << "\n";
-    }
-
-    void debug_verify_data_integrity(){
-		if (length == 0) {
-			assert(head == nullptr);
-			assert(tail == nullptr);
-		} else {
-			assert(head != nullptr);
-			assert(tail != nullptr);
-			if (length == 1)
-				assert(head == tail);
-			else
-				assert(head != tail);
-			assert(!head->prev);
-			assert(!tail->next);
-		}
-		int len = 0;
-		for (Node* cur = head; cur; cur = cur->next, len++) {
-			if (len == length-1)	// make sure we end at tail
-				assert(cur == tail);
-		}
-
-		assert(length == len);
-		assert(length == (int )debug_data.size());
-
-		len = 0;
-		for (Node* cur = tail; cur; cur = cur->prev, len++) {
-			if (len == length-1)	// make sure we end at head
-				assert(cur == head);
-		}
-    }
-    ///////////////////////////////////////////////////////////////
-
-    // maintain vector data & length
-    void add_node(Node* item){
-        debug_add_node(item);
-        ++length;
-    }
-    void delete_node(Node* item){
-        debug_remove_node(item);
-        --length;
-        delete item;
-    }
-
-    void print(){
-        for(Node* cur=head; cur; cur=cur->next)
-            cout << cur->data << " ";
-        cout << "\n";
-    }
-    void print_reverse_listd(){
-        for(Node* cur=tail; cur; cur=cur->prev)
-            cout << cur->data << " ";
-        cout << "\n";
-    }
-
-    void link(Node* first, Node* second){
-        if(first)
-            first->next = second;
-        if(second)
-            second->prev = first;
-    }
-
-    void insert_front(int value){
-        Node* item = new Node(value);
-        add_node(item);
-
-        if(!head)
-            head = tail = item;
-        else{
-            link(item, head);
-            head = item;
-        }
-
-        debug_verify_data_integrity();
-    }
     void insert_end(int value){
         Node* item = new Node(value);
-        add_node(item);
 
         if(!head)
             head = tail = item;
@@ -184,242 +44,112 @@ public:
             link(tail, item);
             tail = item;
         }
-
-        debug_verify_data_integrity();
+        ++length;
     }
 
-    void embed_after(Node* node_before, int value){
-        Node* item = new Node(value);
-        add_node(item);
-
-        Node* node_after = node_before->next;
-
-        link(node_before, item);
-        link(item, node_after);
-    }
-    void insert_sorted(int value){
-        if(!length || head->data >= value)
-            insert_front(value);
-        else if(tail->data <= value)
-            insert_end(value);
-        else{
-            for(Node* cur=head; cur; cur=cur->next){
-                if(cur->data >= value){
-                    embed_after(cur->prev, value);
-
-                    debug_verify_data_integrity();
-                    break;
-                }
-            }
+    void print(){
+        for(Node* cur=head; cur; cur=cur->next){
+            cout << cur->data << " ";
+            if(cur == head)
+                cout << "<- head ";
+            else if(cur == tail)
+                cout << "<- tail\n";
         }
-        sort(debug_data.begin(), debug_data.end(), sort_data);
     }
 
-    void delete_front(){
-        if(!head)
+    void mergeList(LinkedList &another){
+        if(!another.length)
             return;
 
-        Node* cur=head->next;
-        delete_node(head);
-
-        head = cur;
-        if(head)
-            head->prev = nullptr;
-        else
-            tail = nullptr;
-
-        debug_verify_data_integrity();
-    }
-    void delete_end(){
-        if(!head)
-            return;
-
-        Node* cur=tail->prev;
-        delete_node(tail);
-
-        tail = cur;
-        if(tail)
-            tail->next = nullptr;
-        else
+        if(head){
+            Node *cur1 = head;
+            Node *cur2 = another.head;
+            Node *last{};
             head = nullptr;
 
-        debug_verify_data_integrity();
-    }
-
-    Node* delete_and_link(Node* cur){
-        Node* ret = cur->prev;
-        // delete and connect
-        link(ret, cur->next);
-        delete_node(cur);
-
-        return ret;
-    }
-    void delete_node_with_key(int key){ // time O(n) - memory O(1)
-        if(!head)
-            cout << "List is empty\n";
-        else if(head->data == key)
-            delete_front();
-        else if(tail->data == key)
-            delete_end();
-        else{
-            for(Node* cur=head; cur; cur=cur->next){
-                    if(cur->data == key){
-                        delete_and_link(cur);
-                        return;
-                    }
+            while(cur1 && cur2){
+                Node* Next{};
+                if(cur1->data <= cur2->data){
+                    Next = cur1;
+                    cur1 = cur1->next;
+                }else{
+                    Next = cur2;
+                    cur2 = cur2->next;
                 }
-                cout << "No value with such a key\n";
+                link(last, Next);
+                last = Next;
+                if(!head)
+                    head = last;
             }
-        debug_verify_data_integrity();
-    }
-    /// Problem #1: Find the middle
-    int middle_value1(){ // time O(n) - memory O(1)
-        assert(head);
-
-        Node *h=head, *t=tail;
-
-        while(h!=t && h->prev!=t)
-            h=h->next, t=t->prev;
-
-        return h->data;
-    }
-    int middle_value2(){
-        assert(head);
-        /*
-		 * The idea is simple but smart!
-		 * use 2 pointers
-		 * The first (slow) moves normally step by step
-		 * The second (fast) jump 2 steps each time!
-		 * If the List has e.g. 10 elements
-		 * When the slow in the middle (e.g. 5), the fast is at the double (10)
-		 * From that we know we found the middle.
-		 */
-
-        Node *slow=head, *fast=head;
-
-        while(fast && fast->next){
-                fast = fast->next->next; // Hare: jump 2 steps
-            slow = slow->next;       // Tortoise
+            if(cur2){
+                tail = another.tail;
+                link(last, cur2);
+            }else if(cur1){
+                link(last, cur1);
+            }
         }
-
-        return slow->data;
-    }
-    /// Problem #2: Swap forward with backward
-    Node* get_nth(int k){
-        if(k>=length)
-            return nullptr;
-
-        Node* ret = head;
-        while(k--)
-            ret = ret->next;
-        return ret;
-    }
-    Node* get_nth_back(int k){
-        if(k>=length)
-            return nullptr;
-
-        Node* ret = tail;
-        while(k--)
-            ret = ret->prev;
-        return ret;
-    }
-    /// Problem #3: reverse_list List nodes
-    void reverse_list(){
-        if(length<=1)
-            return;
-
-        Node *first = head, *second = head->next;
-
-        while(second){
-            Node *st = second, *nd = second->next;
-            link(second, first); // reverse
-            first = st, second = nd; // move
+        else{
+            head = another.head;
+            tail = another.tail;
         }
-        swap(head, tail);
-        head->prev = tail->next = nullptr;
-
-        debug_verify_data_integrity();
-    }
-    /// Problem #4: Merge lists
-    void merge2_sorted_lists(LinkedList &other){ // TODO
+        length += another.length;
+        another.head = another.tail = nullptr;
+        another.length = 0;
     }
 };
 
 void test1() {
-	cout << "\n\ntest1\n";
+	cout << "test1\n";
 	LinkedList List1;
-    List1.insert_end(1);
-	List1.insert_end(3);
-	List1.insert_end(5);
+	List1.insert_end(10);
+	List1.insert_end(20);
+	List1.insert_end(30);
+	List1.insert_end(40);
+	List1.insert_end(50);
 
-	LinkedList List2;
-	List2.insert_end(2);
-	List2.insert_end(4);
+    LinkedList List2;
+	List2.insert_end(10);
+	List2.insert_end(25);
+	List2.insert_end(35);
+	List2.insert_end(45);
+	List2.insert_end(55);
 
-	List1.merge2_sorted_lists(List2);
-
+	List1.mergeList(List2);
 	List1.print();
-	//List.print_reverse_listd();
-	List2.print();
-
-	string expected = "1 2 3 4 5";
-	string result = List1.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List1.debug_print_List();
-
 }
 
 void test2() {
 	cout << "\n\ntest2\n";
-	LinkedList List1;
-    List1.insert_end(2);
-	List1.insert_end(3);
+	LinkedList List;
+
+	List.insert_end(1);
+	List.insert_end(2);
+	List.insert_end(3);
+	List.insert_end(4);
+	List.insert_end(5);
 
 	LinkedList List2;
-	List2.insert_end(1);
-	List2.insert_end(2);
 
-	List1.merge2_sorted_lists(List2);
-
-	List1.print();
-	//List.print_reverse_listd();
-	List2.print();
-
-	string expected = "1 2 2 3";
-	string result = List1.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List1.debug_print_List();
+	List.mergeList(List2);
+	List.print();
 }
 
 void test3() {
 	cout << "\n\ntest3\n";
-	LinkedList List1;
+	LinkedList List;
 
 	LinkedList List2;
+
+	List2.insert_end(1);
 	List2.insert_end(2);
 	List2.insert_end(3);
+	List2.insert_end(4);
+	List2.insert_end(5);
+	List2.insert_end(6);
 
-	List1.merge2_sorted_lists(List2);
-
-	List1.print();
-	List2.print();
-	//List.print_reverse_listd();
-
-	string expected = "2 3";
-	string result = List1.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List1.debug_print_List();
+	List.mergeList(List2);
+	List.print();
 }
-
 
 int main() {
 	test1();

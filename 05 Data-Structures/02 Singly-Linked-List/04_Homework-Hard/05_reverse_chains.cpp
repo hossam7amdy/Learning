@@ -1,142 +1,34 @@
-// To Do later
-
 #include<iostream>
-#include<assert.h>
-#include<vector>
-#include<algorithm>
-#include<sstream>
 using namespace std;
-
-struct Node{
-    int data { };
-    Node* next { };
-
-    Node(int data): data(data){  }
-    ~Node() {
-		//To easily test your nodes are destructed
-		cout << "Destroy value: " << data << "\n";
-	}
-};
-
-bool debug_sort_data(const Node* n1, const Node* n2){
-    return n1->data < n2->data;
-}
 
 class LinkedList{
 private:
-    Node* head { };
-    Node* tail { };
-    int length { };
+    // the { } initializes object pointer to null.
+    //TIP: Always Initialize
 
-    void delete_node(Node* item){
-        debug_remove_node(item);
-        delete item;
-        length--;
+    struct Node{
+        int data { };
+        Node* next { }; // initialized with null
+
+        Node(int data): data(data) {  }
+    };
+
+    Node *head { };
+    Node *tail { };
+    int length {0};
+
+    void deleteNode(Node* target){
+        --length;
+        if(target == head)
+            head = head->next;
+        else if(target == tail)
+            head = tail = nullptr;
+
+        delete target;
     }
-
-    vector<Node*> debug_data;	// add/remove nodes you use
-	void debug_add_node(Node* node) {
-		debug_data.push_back(node);
-	}
-	void debug_remove_node(Node* node) {
-		auto it = std::find(debug_data.begin(), debug_data.end(), node);
-		if (it == debug_data.end())
-			cout << "Node does not exist\n";
-		else
-			debug_data.erase(it);
-	}
-
 public:
-    LinkedList() {  }
-	LinkedList(const LinkedList&) = delete;
-	LinkedList &operator=(const LinkedList &another) = delete;
-    ~LinkedList(){
-        while(head){
-            Node* current = head->next;
-            length--;
-            delete head;
-            head = current;
-        }
-    }
-
-	///////////////// Debugging Utilities ///////////////
-	void debug_Print_node(Node* node, bool is_seperate = false) {
-		if (is_seperate)
-			cout << "Sep: ";
-		if (node == nullptr) {
-			cout << "nullptr\n";
-			return;
-		}
-		cout << node->data << " ";
-		if (node->next == nullptr)
-			cout << "X ";
-		else
-			cout << node->next->data << " ";
-
-		if (node == head)
-			cout << "head\n";
-		else if (node == tail)
-			cout << "tail\n";
-		else
-			cout << "\n";
-	}
-	void debug_Print_List(string msg = "") {
-		if (msg != "")
-			cout << msg << "\n";
-		for (int i = 0; i < (int) debug_data.size(); ++i)
-			debug_Print_node(debug_data[i]);
-		cout << "************\n"<<flush;
-	}
-
-	string debug_to_string() {
-		if (length == 0)
-			return "";
-		ostringstream oss;
-		for (Node* cur = head; cur; cur = cur->next) {
-			oss << cur->data;
-			if (cur->next)
-				oss << " ";
-		}
-		return oss.str();
-	}
-
-	void debug_verify_data_integrity() {
-		if (length == 0) {
-			assert(head == nullptr);
-			assert(tail == nullptr);
-		} else {
-			assert(head != nullptr);
-			assert(tail != nullptr);
-			if (length == 1)
-				assert(head == tail);
-			else
-				assert(head != tail);
-			assert(!tail->next);
-		}
-		int len = 0;
-		for (Node* cur = head; cur; cur = cur->next, len++)
-			assert(len < 10000);	// Consider infinite cycle?
-		assert(length == len);
-		assert(length == (int)debug_data.size());
-	}
-	////////////////////////////////////////////////////
-    void Print(){
-        Node *temp = head;
-        while(temp != nullptr){
-            cout << temp->data << " :" << &temp->next << " =>>| ";
-            temp = temp->next;
-        }
-        cout << "null\n";
-
-        temp = head;
-        while(temp != nullptr){
-            debug_Print_node(temp);
-            temp = temp->next;
-        }
-        cout << "\n";
-    }
-    void insert_end(int value){ // time O(1) - memory O(1)
-        Node* item = new Node(value);
+    void insertEnd(const int &dataue){ // O(1)
+        Node* item = new Node(dataue);
 
         if(!head)
             head = tail = item;
@@ -144,539 +36,80 @@ public:
             tail->next = item;
             tail = item;
         }
-        debug_add_node(item);
-        length++;
-    }
-    void insert_front(int value){ // time O(1) - memory O(1)
-        Node* item = new Node(value);
 
+        ++length;
+    }
+
+    void reverseChain(int k){
         if(!head)
-            head = tail = item;
-        else{
-            item->next = head;
-            head = item;
-        }
-        debug_add_node(item);
-        length++;
-    }
-    void delete_front(){ // time O(1) - memory O(1)
-
-        Node* temp = head->next;
-        delete_node(head);
-        head = temp;
-
-        if(length<=1)
-            tail = head;
-
-        debug_verify_data_integrity();
-    }
-    Node* get_nth(int n){
-        n--; // Zero-Based
-        if(0>n || n>length)
-            return nullptr;
-
-        Node* res = head;
-        while(n--)
-            res = res->next;
-        return res;
-    }
-    Node* get_nth_back(int n){
-        return get_nth(length - n + 1);
-    }
-    bool is_same1(const LinkedList &other){
-        if(this->length!=other.length)
-            return false;
-        else{
-            for(Node* curr_h=this->head, *other_h=other.head; curr_h; curr_h=curr_h->next, other_h=other_h->next)
-                if(curr_h->data!=other_h->data)
-                    return false;
-        }
-
-        return true;
-    }
-    bool is_same2(const LinkedList &other){
-        Node* h1=this->head, *h2=other.head;
-
-        while(h1&&h2){
-            if(h1->data!=h2->data)
-                return false;
-
-            h1=h1->next, h2=h2->next;
-        }
-
-        return !h1&&!h2;
-    }
-    void delete_middle(Node* node){
-        Node* to_delete = node->next;
-
-        if(to_delete==tail){
-            tail = node;
-            tail->next = nullptr;
-        }
-        else
-            node->next = node->next->next;
-
-        delete_node(to_delete);
-    }
-    void delete_node_with_key(int value){
-        if(length==0)
-            cout << "Empty List\n";
-        else if(head->data==value)
-            delete_front();
-        else{
-            for(Node* cur=head, *prev { }; cur; prev=cur, cur=cur->next){
-                if(cur->data == value){
-                    delete_middle(prev);
-                    break;
-                }
-            }
-            cout << "There is no such a value\n";
-        }
-        debug_verify_data_integrity();
-    }
-    void swap_pairs(){
-        for(Node* cur=head; cur&&cur->next; cur=cur->next->next)
-            swap(cur->data, cur->next->data);
-    }
-    void Reverse(int k){ // time O(n) - memory O(1)
-        if(k<=1)
             return;
 
-        tail = head;
-        Node* prev = head;
+        Node *first = head, *second = head->next;
+        while(second && --k){
+            Node *secondNext = second->next;
 
-        head = head->next;
-        while(k--){
-            Node* next = head->next;
-            head->next = prev;
+            second->next = head;
+            first->next = secondNext;
 
-            prev = head;
-            head = next;
+            head = second;
+            second = secondNext;
         }
-
-        head = prev;
-        tail->next = nullptr;
-
-        reverse(debug_data.begin(), debug_data.end());
-        debug_verify_data_integrity();
-
+        if(!first->next)
+            tail = first;
     }
-    void delete_even_positions(){
-        if(length<=1)
-            return;
-        Node* cur = head;
-        while(cur && cur->next){ // time O(n/2) - memory O(1)
-            Node* target = cur;
-            cur = cur->next->next;
-            delete_middle(target);
+
+    void Print(){ // O(n)
+        for(Node* cur{head}; cur; cur=cur->next){
+            cout << cur->data << " ";
+            if(cur == head)
+                cout << "<-head ";
+            if(cur == tail)
+                cout << "<-tail\n";
         }
-        debug_verify_data_integrity();
-    }
-    void embed_after(Node* prev, int value){
-        Node* item = new Node(value);
-
-        item->next = prev->next;
-        prev->next = item;
-        length++;
-
-        debug_add_node(item);
-        sort(debug_data.begin(), debug_data.end(),debug_sort_data);
-    }
-    void insert_sorted(int value){
-        if(!head || value<=head->data)
-            insert_front(value);
-        else if(value>=tail->data)
-            insert_end(value);
-        else{
-            for(Node *cur=head, *prev{ }; cur; prev=cur,cur=cur->next){
-                if(value<=cur->data){
-                    embed_after(prev, value);
-                    break;
-                }
-            }
-        }
-        debug_verify_data_integrity();
-    }
-    void swap_head_tail(){ // time O(n) - memory O(1)
-        if(length<=1)
-            return;
-
-        if(length==2){
-            swap(head,tail);
-            head->next = tail;
-            tail->next = nullptr;
-            return;
-        }
-
-        Node* prev = get_nth(length-1);
-
-        tail->next = head->next;
-
-        prev->next = head;
-        head->next = nullptr;
-
-        swap(tail,head);
-
-        swap(debug_data[0], debug_data[length-1]);
-        debug_verify_data_integrity();
-    }
-    void left_rotate(int k){ // time O(n) - memory O(1)
-        if(length<=1 || k%length==0)
-            return;
-        k%=length;
-
-        Node* target = get_nth(k);
-        tail->next = head;
-
-        head = target->next;
-        tail = target;
-
-        target->next = nullptr;
-        debug_verify_data_integrity();
-    }
-    void remove_duplicates_from_not_sorted(){ // time O(n^2) - memory O(1)
-        if(length<2)
-            return;
-
-        for(Node *cur=head; cur; cur=cur->next){
-            for(Node *prev=cur,*next=cur->next; next;){
-                if(cur->data==next->data){
-                    next=next->next; // move first
-                    delete_middle(prev);
-                    continue;
-                }
-                prev=next, next=next->next; // normal
-            }
-        }
-        debug_verify_data_integrity();
-    }
-    void remove_last_ocurrence(int value){ // time O(n) - memory O(1)
-        if(!length)
-            return;
-
-        Node* target { };
-        for(Node *cur=head, *prev{ }; cur; prev=cur, cur=cur->next){
-            if(cur->data == value){
-                if(cur==head)
-                    target = cur;
-                else
-                    target = prev;
-            }
-        }
-
-        if(target){
-            if(target==head)
-                delete_front();
-            else
-                delete_middle(target);
-            }
-        else
-            cout << "There is no such value.\n";
-
-        debug_verify_data_integrity();
-    }
-    Node* move_to_end(Node* prev, Node* cur){ // maintain tail and return the valid cur
-        Node* next = cur->next;
-        tail->next = cur;
-
-        if(prev)
-            prev->next = next;
-        else
-            head = next; // was head
-
-        tail=cur;
-        tail->next = nullptr;
-        return next;
-    }
-    void move_key_occurance_to_end(int value){ // time O(n) - memory O(1)
-        if(length<=1)
-            return;
-
-        int len = length; // length steps only
-        for(Node *cur=head, *prev{ }; len--;){
-            if(cur->data==value)
-                cur = move_to_end(prev, cur);
-            else
-                prev=cur, cur=cur->next; // normal step
-        }
-        debug_verify_data_integrity();
-    }
-    int Max(Node *cur=nullptr, bool first_call=true){ // time o(n) - memory O(n)
-        if(first_call)
-            return Max(head, false);
-
-        if(cur==nullptr)
-            return INT_MIN;
-
-        return max(cur->data, Max(cur->next, false));
-    }
-    /// Problem #1: Arrange odd & even nodes
-    void arrange_even_odd(){ // time O(n) - memory O(1)
-        if(length<=2)
-            return;
-
-        Node* cur_odd = head;
-        Node* first_even = head->next;
-
-        while(cur_odd->next && cur_odd->next->next){
-            Node* next_even = cur_odd->next;
-
-            cur_odd->next = cur_odd->next->next;
-            next_even->next = next_even->next->next;
-
-            cur_odd = cur_odd->next;
-
-            if(length%2==1)
-                tail = next_even;
-        }
-        cur_odd->next = first_even;
-
-        debug_verify_data_integrity();
-    }
-    /// Problem #2: Insert alternating
-    void insert_alternate(LinkedList &another){ // time O(n) - memory O(1)
-        if(!another.length)
-            return;
-        else if(!length){
-            head = another.head;
-            tail = another.tail;
-            length = another.length;
-
-            debug_data = another.debug_data;
-        }
-        else{
-            Node* cur2 = another.head;
-            for(Node* cur1 = head; cur1&&cur2;){
-                Node* temp_cur2_next = cur2->next;
-
-                cur2->next = cur1->next;
-                cur1->next = cur2;
-
-                cur2 = temp_cur2_next;
-
-                debug_add_node(cur2);
-
-                if(cur1==tail){
-                    tail = another.tail;
-                    cur1->next->next = cur2;
-                    break;
-                }
-                cur1 = cur1->next->next;
-            }
-
-            length += another.length;
-            another.head = another.tail = nullptr;
-            another.length = 0;
-            another.debug_data.clear();
-            //debug_verify_data_integrity();
-        }
-    }
-    /// Problem #3: Adding 2 HUGE numbers
-    void add_number(const LinkedList &another){
-        Node *cur1 = head;
-        Node *cur2 = another.head;
-        int carry = 0;
-
-        while(cur1&&cur2){ // if the two Lists are equal
-            carry = 0;
-            int sum = cur1->data + cur2->data;
-
-            if(sum>9)
-                cur1->data = sum%10;
-            else
-            {
-                cur1->data = sum;
-                cur1 = cur1->next;
-                cur2 = cur2->next;
-                continue;
-            }
-
-            carry = sum / 10;
-
-            cur1 = cur1->next;
-            cur2 = cur2->next;
-
-            if(cur1)
-                cur1->data += sum;
-            else
-                insert_end(sum);
-        }
-    }
-    /// Problem #4: Remove all repeated
-    void remove_all_repeated_from_sorted(){
-        if(length<2)
-            return;
-
-        int was_repeated = -1;
-        Node *last_still { };
-        for(Node *prev=head, *cur=head->next; cur; prev=cur, cur=cur->next){
-            if(prev->data == cur->data){
-                was_repeated = cur->data;
-                if(prev==head)
-                    head = cur;
-
-                delete_node(prev);
-            }
-            else if(was_repeated!=-1){
-                was_repeated = -1;
-                if(prev==head)
-                    head = cur;
-                delete_node(prev);
-            }
-            else{
-                if(!last_still)
-                    last_still = prev;
-                else{
-                    last_still->next = prev;
-                    last_still = prev;
-                }
-            }
-        }
-
-        if(was_repeated==tail->data){
-            delete_node(tail);
-            if(length>0)
-                tail = get_nth(length);
-            else
-                tail = head = nullptr;
-        }
-    }
-    /// Problem #4: Reverse Chain
-    Node* reverse_from(Node* node, int k){ // time O(n) - memory O(n)
-        if(node->next || k)
-            reverse_from(node->next,k--)->next = node;
-
-        return node;
-    }
-    void reverse_chain(int k){ // memory O(n)
-        reverse_from(head, k);
-        swap(head,tail);
-        tail->next = nullptr;
-        reverse(debug_data.begin(), debug_data.end());
-        debug_verify_data_integrity();
+        cout << "==========================\n";
     }
 };
 
-void test1() {
-	cout << "\n\ntest1\n";
-	LinkedList List;
+void test1(){
+    LinkedList list1;
+    list1.insertEnd(1);
+    list1.insertEnd(2);
+    list1.insertEnd(3);
+    list1.insertEnd(4);
+    list1.insertEnd(5);
+    list1.insertEnd(6);
+    list1.insertEnd(7);
 
-	List.insert_end(0);
-	List.insert_end(1);
-
-	List.remove_all_repeated_from_sorted();
-	List.Print();
-
-	string expected = "0 1";
-	string result = List.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List.debug_Print_List("********");
+    list1.reverseChain(3);
+    list1.Print(); //
 }
 
-void test2() {
-	cout << "\n\ntest2\n";
-	LinkedList List;
+void test2(){
+    LinkedList list1;
+    list1.insertEnd(1);
+    list1.insertEnd(2);
 
-	List.insert_end(1);
-	List.insert_end(1);
-
-	List.remove_all_repeated_from_sorted();
-	List.Print();
-
-	string expected = "";
-	string result = List.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List.debug_Print_List("********");
+    list1.reverseChain(1);
+    list1.Print(); //
 }
 
-void test3() {
-	cout << "\n\ntest3\n";
-	LinkedList List;
+void test3(){
+    LinkedList list1;
+    list1.insertEnd(1);
+    list1.insertEnd(2);
+    list1.insertEnd(3);
+    list1.insertEnd(4);
+    list1.insertEnd(5);
 
-	List.insert_end(1);
-	List.insert_end(1);
-	List.insert_end(2);
-	List.insert_end(2);
-
-	List.remove_all_repeated_from_sorted();
-	List.Print();
-
-	string expected = "";
-	string result = List.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List.debug_Print_List("********");
+    list1.reverseChain(5);
+    list1.Print(); //
 }
 
-void test4() {
-	cout << "\n\ntest4\n";
-	LinkedList List;
+int main(){
+    test1();
+    test2();
+    test3();
 
-	List.insert_end(1);
-	List.insert_end(1);
-	List.insert_end(2);
-	List.insert_end(3);
-	List.insert_end(3);
-	List.insert_end(4);
-	List.insert_end(4);
-	List.insert_end(5);
-	List.insert_end(6);
-
-	List.remove_all_repeated_from_sorted();
-	List.Print();
-
-	string expected = "2 5 6";
-	string result = List.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List.debug_Print_List("********");
-}
-
-void test5() {
-	cout << "\n\ntest5\n";
-	LinkedList List;
-
-	List.insert_end(1);
-	List.insert_end(2);
-	List.insert_end(3);
-	List.insert_end(4);
-	List.insert_end(5);
-	List.insert_end(6);
-	List.insert_end(7);
-
-	List.Reverse(3);
-	List.Print();
-
-	string expected = "7 6 5 4 3 2 1";
-	string result = List.debug_to_string();
-	if (expected != result) {
-		cout << "no match:\nExpected: " << expected << "\nResult  : " << result << "\n";
-		assert(false);
-	}
-	List.debug_Print_List("********");
-}
-
-
-int main() {
-
-	//test1();
-	//test2();
-	//test3();
-	//test4();
-	test5();
-
-	// must see it, otherwise RTE
-	cout << "\n\nNO RTE\n";
-
-	return 0;
+    cout << "NO RTE";
+    return 0;
 }
