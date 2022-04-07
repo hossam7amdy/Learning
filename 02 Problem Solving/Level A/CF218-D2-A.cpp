@@ -2,9 +2,6 @@
 #include<vector>
 using namespace std;
 
-/// https://codeforces.com/contest/143/problem/A
-
-
 int main(){
     int n,k;
     cin >> n >> k;

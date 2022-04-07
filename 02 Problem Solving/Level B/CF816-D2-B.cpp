@@ -3,8 +3,6 @@
 #include<vector>
 using namespace std;
 
-/// https://codeforces.com/problemset/problem/816/B
-
 int main()
 {
     const int MAX {200001};

@@ -3,11 +3,9 @@
 #include <cstring>
 using namespace std;
 
-/// https://onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=3104
-
 int const MAX = 100;
 char grid[MAX][MAX];
-bool visited[MAX][MAX]{0};
+bool visited[MAX][MAX];
 int N;
 
 void dfs(int r, int c){
@@ -38,16 +36,15 @@ int ConnectedComponentCnt(){
 
 int main(){
     int T;
-    int Case = 1;
     cin >> T;
-    while(T--){
+    for(int Case=1; Case<=T; Case++){
         memset(visited, 0, sizeof(visited));
         cin >> N;
         for(int i=0; i<N; i++)
             cin >> grid[i];
 
         int Ships = ConnectedComponentCnt();
-        cout << "Case " << Case++ << ": " << Ships << "\n";
+        cout << "Case " << Case << ": " << Ships << "\n";
     }
 
     return 0;

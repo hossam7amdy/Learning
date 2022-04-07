@@ -1,8 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-/// https://www.spoj.com/problems/TOE1/
-
 const int sz = 3;
 vector<string> v(sz);
 bool won(vector<pair<int,int>> pairs, const char &ch){

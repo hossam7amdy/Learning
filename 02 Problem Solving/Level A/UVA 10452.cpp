@@ -2,7 +2,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-/// https://onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1393
 
 int const MAX = 8;
 vector<string> lines;
