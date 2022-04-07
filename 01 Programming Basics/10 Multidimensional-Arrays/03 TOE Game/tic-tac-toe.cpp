@@ -7,6 +7,54 @@ using namespace std;
 // player x = 1
 // player o = 2
 
+class player{
+private:
+    int number{};
+    bool status{};
+public:
+    player(const int &num):
+        status(false), number(num){
+    }
+    bool getStatus() const {
+        return this->status;
+    }
+    void setStatus(const bool &status){
+        this->status = status;
+    }
+    int getNumber() const {
+        return this->number;
+    }
+};
+
+class TOE{
+private:
+    static const int MAX{100};
+    int sz{};
+    int players{};
+    int turn{};
+    player* grid[MAX][MAX]{};
+
+    void ShowGrid(){
+        for(int r=0; r<sz; ++r){
+            for(int c=0; c<sz; ++c){
+                if(!grid[r][c]) cout << ".";
+                else cout << grid[r][c]->getNumber();
+            }
+            cout << "\n";
+        }
+    }
+
+public:
+    TOE(const int &sz, const int &players):
+        sz(sz), players(players){
+            assert(sz < MAX);
+    }
+    void play(){
+        ShowGrid();
+    }
+};
+
+
 int N;
 const int MAX{10};
 int grid[MAX][MAX]{};
@@ -89,7 +137,11 @@ void Run(){
 }
 
 int main(){
+    //TOE game(10, 5);
+    //game.play();
+
     Run();
+
 
     return 0;
 }
