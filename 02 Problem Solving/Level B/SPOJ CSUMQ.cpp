@@ -3,7 +3,6 @@
 #include<vector>
 using namespace std;
 
-/// https://www.spoj.com/problems/CSUMQ/
 
 int main()
 {
