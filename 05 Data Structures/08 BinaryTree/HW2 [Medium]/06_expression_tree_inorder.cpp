@@ -1,6 +1,5 @@
 #include<iostream>
 #include<vector>
-#include<cmath>
 #include<stack>
 #include<assert.h>
 using namespace std;
@@ -14,55 +13,67 @@ private:
     BinaryTree* left{ };
     BinaryTree* right{ };
 
+    bool is_just_num() {
+        return !left && !right;
+    }
+
+
 public:
     BinaryTree(const type &data):
         data(data){
     }
-    BinaryTree(const string &postfix){
-        stack<BinaryTree*> st;
+    BinaryTree(const string &postorder){
+        stack<BinaryTree*> subTrees;
 
-        for(int i=0; i<(int)postfix.size(); i++){
-            BinaryTree* cur = new BinaryTree(postfix[i]);
+        for(int i = 0; i < (int)postorder.size(); ++i){
+            BinaryTree *cur = new BinaryTree(postorder[i]);
 
-            if(!isdigit(postfix[i])){
-                cur->right = st.top();
-                st.pop();
-                cur->left = st.top();
-                st.pop();
+            if(!isdigit(postorder[i])){
+                cur->right = subTrees.top();
+                subTrees.pop();
+                cur->left = subTrees.top();
+                subTrees.pop();
             }
-            st.push(cur);
+
+            subTrees.push(cur);
         }
-        BinaryTree* root = st.top();
+
+        BinaryTree *root = subTrees.top();
+        subTrees.pop();
+
         this->data = root->data;
         this->left = root->left;
         this->right = root->right;
     }
-    void print_inOrder() {
-        if (left)
-            left->print_inOrder();
-        cout << data << " ";
-        if(right)
-            right->print_inOrder();
-    }
-    void add(const vector<type> &data, const vector<char> &direction){
-        assert((int)data.size() == (int)direction.size());
-        BinaryTree* current = this;
 
-        for(int i=0; i<(int)data.size(); i++){
-            if(direction[i] == 'L'){
-                if(!current->left)
-                    current->left = new BinaryTree(data[i]);
-                else
-                    assert(current->left->data == data[i]);
-                current = current->left;
-            }else{
-                if(!current->right)
-                    current->right = new BinaryTree(data[i]);
-                else
-                    assert(current->right->data == data[i]);
-                current = current->right;
-            }
+    void print_inorder_expression() {
+        if (left){
+            if(!left->is_just_num())
+                cout << "(";
+            left->print_inorder_expression();
+            if(!left->is_just_num())
+                cout << ")";
         }
+
+        cout << data;
+
+
+        if(right){
+            if(!right->is_just_num())
+                cout << "(";
+            right->print_inorder_expression();
+            if(!right->is_just_num())
+                cout << ")";
+        }
+    }
+    void print_postorder_expression() {
+        if(left)
+            left->print_postorder_expression();
+
+        if(right)
+            right->print_postorder_expression();
+
+        cout << data;
     }
 
     void clear_nodes() {
@@ -75,83 +86,12 @@ public:
             right = nullptr;
         }
     }
+
     ~BinaryTree(){
-        //cout << "Node " << data << " deleted at address " << this << "\n";
+        // cout << "Node " << data << " deleted at address " << this << "\n";
         clear_nodes();
     }
-
-    void print_inorder_iteratively(){
-        stack< pair<BinaryTree*, bool> > st;
-
-        st.push(make_pair(this, false));
-
-        while(!st.empty()){
-            BinaryTree* current = st.top().first;
-            bool is_done = st.top().second;
-
-            st.pop();
-            if(is_done)
-                cout << current->data;
-            else{
-                if(current->right)
-                    st.push(make_pair(current->right, false));
-
-                st.push(make_pair(current, true));
-
-                if(current->left)
-                    st.push(make_pair(current->left, false));
-            }
-        }
-    }
-
-    void traverse_left_boundary(){
-        cout << data << " ";
-        if(left)
-            left->traverse_left_boundary();
-        else if(right)
-            right->traverse_left_boundary();
-    }
-
-    int tree_height(){
-        int res = 0;
-        if(left)
-            res = 1 + left->tree_height();
-        if(right)
-            res = max(res, 1 + right->tree_height());
-        return res;
-    }
-    int tree_diameter(){
-        int res = 0;
-        if(this->left)
-            res = 1 + this->left->tree_height();
-        if(this->right)
-            res += 1 + this->right->tree_height();
-        return res;
-    }
-
-    bool is_just_num(){
-        return !left && !right;
-    }
-    void print_inorder_expression(){
-        if(left){
-            if(!left->is_just_num())
-                cout << "(";
-            left->print_inorder_iteratively();
-            if(!left->is_just_num())
-                cout << ")";
-        }
-        cout << data;
-        if(right){
-            if(!right->is_just_num())
-                cout << "(";
-            right->print_inorder_iteratively();
-            if(!right->is_just_num())
-                cout << ")";
-        }
-    }
-
 };
-
 
 void test1() {
 	BinaryTree root("51+");
@@ -160,7 +100,6 @@ void test1() {
 	root.print_inorder_expression();
 	cout << "\n";
 	// infix expression: 5+1
-
 }
 
 void test2() {

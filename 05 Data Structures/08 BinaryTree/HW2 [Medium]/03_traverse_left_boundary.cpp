@@ -6,7 +6,6 @@
 using namespace std;
 
 
-
 typedef int type;
 class BinaryTree{
 private:
@@ -58,30 +57,6 @@ public:
     ~BinaryTree(){
         cout << "Node " << data << " deleted at address " << this << "\n";
         clear_nodes();
-    }
-
-    void print_inorder_iteratively(){
-        stack< pair<BinaryTree*, bool> > st;
-
-        st.push(make_pair(this, false));
-
-        while(!st.empty()){
-            BinaryTree* current = st.top().first;
-            bool is_done = st.top().second;
-
-            st.pop();
-            if(is_done)
-                cout << current->data << " ";
-            else{
-                if(current->right)
-                    st.push(make_pair(current->right, false));
-
-                st.push(make_pair(current, true));
-
-                if(current->left)
-                    st.push(make_pair(current->left, false));
-            }
-        }
     }
 
     void traverse_left_boundary(){
