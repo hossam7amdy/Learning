@@ -7,7 +7,6 @@
 using namespace std;
 
 
-
 typedef int type;
 class BinaryTree{
 private:
@@ -18,32 +17,6 @@ private:
 public:
     BinaryTree(const type &data):
         data(data){
-    }
-    BinaryTree(const string &postfix){
-        stack<BinaryTree*> st;
-
-        for(int i=0; i<(int)postfix.size(); i++){
-            BinaryTree* cur = new BinaryTree(postfix[i]);
-
-            if(!isdigit(postfix[i])){
-                cur->right = st.top();
-                st.pop();
-                cur->left = st.top();
-                st.pop();
-            }
-            st.push(cur);
-        }
-        BinaryTree* root = st.top();
-        this->data = root->data;
-        this->left = root->left;
-        this->right = root->right;
-    }
-    void print_inOrder() {
-        if (left)
-            left->print_inOrder();
-        cout << data << " ";
-        if(right)
-            right->print_inOrder();
     }
     void add(const vector<type> &data, const vector<char> &direction){
         assert((int)data.size() == (int)direction.size());
@@ -81,36 +54,35 @@ public:
         clear_nodes();
     }
 
-    int tree_height(){
-        int height = 0;
+    int tree_height() {
+        int res = 0;
         if(left)
-            height = 1 + left->tree_height();
+            res = max(res, 1 + left->tree_height());
         if(right)
-            height = max(height, 1 + right->tree_height());
-
-        return height;
+            res = max(res, 1 + right->tree_height());
+        return res;
     }
-    void print_level(const int &level){
-        if(level==0)
+
+    void print_level(int level) {
+        if(level == 0)
             cout << data << " ";
-        else{
-            if(left)
-                left->print_level(level-1);
-            if(right)
-                right->print_level(level-1);
-        }
-    }
-    void print_level_order_recursive(){ // time O(n^2)
-        int h = tree_height();
 
-        for(int i=0; i<=h; i++){
-            cout << "Level " << i+1 << ": ";
-            print_level(i);
-            cout << "\n";
-        }
+        if (left)
+            left->print_level(level - 1);
+        if(right)
+            right->print_level(level - 1);
+    }
+
+    void level_order_traversal_recursive() { // O(n^2)
+
+        int height = tree_height(); // O(n)
+
+        for(int level = 0; level <= height; ++level)
+            print_level(level); // O(n)
     }
 
 };
+
 
 
 void test1() {
@@ -120,8 +92,7 @@ void test1() {
 	tree.add( { 2, 5, 9 }, { 'L', 'R', 'R' });
 	tree.add( { 3, 6, 15 }, { 'R', 'R', 'L' });
 
-	tree.print_level_order_recursive();
-	//cout << tree.tree_height();
+	tree.level_order_traversal_recursive();
 	cout << "\n";
 }
 
@@ -143,13 +114,13 @@ void test2() {
 	tree.add( { 3, 14, 15 }, { 'R', 'L', 'L' });
 	tree.add( { 3, 14, 16 }, { 'R', 'L', 'R' });
 
-	tree.print_level_order_recursive();
+	tree.level_order_traversal_recursive();
 	cout << "\n";
 }
 
 int main() {
     test1();
-    //test2();
+    test2();
 
 	cout << "bye\n";
 

@@ -19,32 +19,6 @@ public:
     BinaryTree(const type &data):
         data(data){
     }
-    BinaryTree(const string &postfix){
-        stack<BinaryTree*> st;
-
-        for(int i=0; i<(int)postfix.size(); i++){
-            BinaryTree* cur = new BinaryTree(postfix[i]);
-
-            if(!isdigit(postfix[i])){
-                cur->right = st.top();
-                st.pop();
-                cur->left = st.top();
-                st.pop();
-            }
-            st.push(cur);
-        }
-        BinaryTree* root = st.top();
-        this->data = root->data;
-        this->left = root->left;
-        this->right = root->right;
-    }
-    void print_inOrder() {
-        if (left)
-            left->print_inOrder();
-        cout << data << " ";
-        if(right)
-            right->print_inOrder();
-    }
     void add(const vector<type> &data, const vector<char> &direction){
         assert((int)data.size() == (int)direction.size());
         BinaryTree* current = this;
