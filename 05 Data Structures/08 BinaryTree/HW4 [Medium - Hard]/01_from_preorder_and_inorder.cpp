@@ -9,9 +9,6 @@ using namespace std;
 
 
 typedef int type;
-
-deque<type> traversal;
-
 class BinaryTree{
 private:
     type data{ };
@@ -22,83 +19,22 @@ public:
     BinaryTree(const type &data):
         data(data){
     }
-    BinaryTree(const string &postfix){
-        stack<BinaryTree*> st;
-
-        for(int i=0; i<(int)postfix.size(); i++){
-            BinaryTree* cur = new BinaryTree(postfix[i]);
-
-            if(!isdigit(postfix[i])){
-                cur->right = st.top();
-                st.pop();
-                cur->left = st.top();
-                st.pop();
-            }
-            st.push(cur);
-        }
-        BinaryTree* root = st.top();
-        this->data = root->data;
-        this->left = root->left;
-        this->right = root->right;
-    }
-    /// my gentle code :(
-    /*
-    BinaryTree(deque<type> &preorder, deque<type> &inorder){
-
-        deque<type> left_sub;
-        deque<type> right_sub;
-
-        while(inorder.front()!=preorder.front())
-            left_sub.push_back(inorder.front()), inorder.pop_front();
-
-        while(inorder.back()!=preorder.front())
-            right_sub.push_front(inorder.back()), inorder.pop_back();
-
-        data = preorder.front();
-        preorder.pop_front();
-
-        if(!left_sub.empty())
-            left = new BinaryTree(preorder, left_sub);
-        if(!right_sub.empty())
-            right = new BinaryTree(preorder, right_sub);
-    }
-    */
-    /// Dr's is always optimal :)
-    BinaryTree(deque<type> &preorder, deque<type> &inorder, int inorder_start = 0, int inorder_end = -1){
-        if(inorder_end==-1) // first call
+    BinaryTree(deque<int> &preorder, deque<int> &inorder, int inorder_start = 0, int inorder_end = -1){
+        if(inorder_end == -1)
             inorder_end = (int)inorder.size() - 1;
 
-        data = preorder.front(); // current root
+        int cur_root = preorder.front();
         preorder.pop_front();
 
-        for(int split=inorder_start; split<=inorder_end; ++split){
-            if(inorder[split] == data){
-                if(inorder_start<split) // left exist
+        data = cur_root;
+
+        for(int split = inorder_start; split <= inorder_end; ++split){
+            if(inorder[split] == cur_root){
+                if(inorder_start < split)
                     left = new BinaryTree(preorder, inorder, inorder_start, split - 1);
-                if(split<inorder_end) // right exist
+                if(split < inorder_end)
                     right = new BinaryTree(preorder, inorder, split + 1, inorder_end);
                 break;
-            }
-        }
-    }
-
-    void add(const vector<type> &data, const vector<char> &direction){
-        assert((int)data.size() == (int)direction.size());
-        BinaryTree* current = this;
-
-        for(int i=0; i<(int)data.size(); i++){
-            if(direction[i] == 'L'){
-                if(!current->left)
-                    current->left = new BinaryTree(data[i]);
-                else
-                    assert(current->left->data == data[i]);
-                current = current->left;
-            }else{
-                if(!current->right)
-                    current->right = new BinaryTree(data[i]);
-                else
-                    assert(current->right->data == data[i]);
-                current = current->right;
             }
         }
     }
@@ -118,43 +54,55 @@ public:
         clear_nodes();
     }
 
-    void print_level_order_v1(){
+    void print_preorder() {
+        cout << data << " ";
+        if(left)
+            left->print_preorder();
+        if(right)
+            right->print_preorder();
+    }
+
+    void print_postorder() {
+        if(left)
+            left->print_postorder();
+        if(right)
+            right->print_postorder();
+        cout << data << " ";
+    }
+
+    void print_inorder() {
+        if(left)
+            left->print_inorder();
+        cout << data << " ";
+        if(right)
+            right->print_inorder();
+    }
+
+    void print_level_order() {
         queue<BinaryTree*> que;
         que.push(this);
 
+        int level = 0;
         while(!que.empty()){
-            BinaryTree* cur = que.front();
-            que.pop();
+            int sz = (int)que.size();
 
-            cout << cur->data << " ";
+            cout << "Level " << level << ": ";
+            while(sz--){
+                BinaryTree* cur = que.front();
+                que.pop();
 
-            if(cur->left)
-                que.push(cur->left);
-            if(cur->right)
-                que.push(cur->right);
+                cout << cur->data << " ";
+
+                if(cur->left)
+                    que.push(cur->left);
+                if(cur->right)
+                    que.push(cur->right);
+            }
+            level++;
+            cout << "\n";
         }
     }
-    void print_inorder() {
-		if (left)
-			left->print_inorder();
-		cout << data << " ";
-		if (right)
-			right->print_inorder();
-	}
-	void print_preorder() {
-		cout << data << " ";
-		if (left)
-			left->print_preorder();
-		if (right)
-			right->print_preorder();
-	}
-    void print_postorder() {
-		if (left)
-			left->print_postorder();
-		if (right)
-			right->print_postorder();
-        cout << data << " ";
-	}
+
 };
 
 
@@ -193,7 +141,7 @@ void test1() {
 	cout << "\n";
 	tree.print_inorder();
 	cout << "\n";
-	tree.print_level_order_v1();
+	tree.print_level_order();
 	cout << "\n";
 }
 
