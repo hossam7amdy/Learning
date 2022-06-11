@@ -20,5 +20,26 @@ void readFile(){
 int main(){
     fast_IO();
 
+    int n;
+    cin >> n;
+
+
+    int mp1[2005]{0};
+    int mp2[2005]{0};
+
+    int ans = 0;
+    for(int i = 0; i < n; ++i){
+        int x,y;
+        cin >> x >> y;
+
+        // ans += (x * (x-1)) / 2
+        ans += mp1[x+y];
+        mp1[x+y]++;
+
+        ans += mp2[x-y+1000];
+        mp2[x-y+1000]++;
+    }
+
+    cout << ans << "\n";
     return 0;
 }
