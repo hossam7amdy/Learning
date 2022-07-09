@@ -15,7 +15,6 @@ void readFile(){
     freopen("output.txt", "w", stdout);
 }
 
-
 int main(){
     fast_IO();
 
