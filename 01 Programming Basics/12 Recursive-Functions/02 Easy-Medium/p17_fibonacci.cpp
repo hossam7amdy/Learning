@@ -2,8 +2,10 @@
 using namespace std;
 
 // a lot of redundant overlapping
+int cnt = 0;
 int fib(int n){
-    if(n<=2)
+    ++cnt;
+    if(n <= 1)
         return 1;
 
     return fib(n-1) + fib(n-2);
@@ -11,9 +13,10 @@ int fib(int n){
 
 // no overlapping (greedy)
 long long fib_sequence[100]{0};
-
+int cnt2 = 0;
 long long fibonacci(int n){
-    if(n<=2)
+    ++cnt2;
+    if(n <= 1)
         fib_sequence[n] = 1;
 
     if(fib_sequence[n])
@@ -26,8 +29,8 @@ long long fibonacci(int n){
 int main(){
     int n;
     cin >> n;
-    cout << fib(n) << endl;
-    cout << fibonacci(n) << endl;
+    cout << fib(n) << ", Total Calls: " << cnt << endl;
+    cout << fibonacci(n) << ", Total Calls: " << cnt2 << endl;
 
     // Iterative trial
     int sum{1}, prev{0};

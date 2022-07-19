@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef pair<int,int> CELL;
+#define cell pair<int,int>
 #define x first
 #define y second
 #define ll long long
